@@ -82,7 +82,7 @@
         (= Nat
           (+ a x)
           (+ x a)))
-      (replace       ; here the base case a+0=0+a is replaced with a=a
+      (replace       ; here the base case a=a is replaced with a+0=a
         (add_zero a)
         (λ(x)
           (= Nat x a))
