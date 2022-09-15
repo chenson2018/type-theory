@@ -27,12 +27,14 @@ from (⟨⟩ O) = 0
 from (b O) = (from b) + (from b)
 from (b I) = (from b) + (from b) + 1
 
+-- I don't understand why I need these to be separate definitions if they all just use refl
+
 back-bin : ∀ ( b : Bin ) → (from b) + (from b) ≡ from (b O)
 back-bin ⟨⟩ = refl                   
 back-bin (b O) = refl
 back-bin (b I) = refl 
 
-help-from-inc : ∀ ( b : Bin) → from ((inc b) O) ≡ (from (inc b)) + (from (inc b))
+help-from-inc : ∀ ( b : Bin) → from ((inc b) O) ≡ from (inc b) + from (inc b)
 help-from-inc ⟨⟩ = refl         
 help-from-inc (b O) = refl
 help-from-inc (b I) = refl
