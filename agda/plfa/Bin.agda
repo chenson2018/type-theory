@@ -39,6 +39,12 @@ help-from-inc ⟨⟩ = refl
 help-from-inc (b O) = refl
 help-from-inc (b I) = refl
 
+{-
+  I would like to use the ring solver directly, but it seems to require free variables
+  It would be nice to have a way for instance to pass (from b) that evaluates to a Nat
+  This was helpful: https://gist.github.com/andrejbauer/358722620c26c09d6be218bcd95ee654
+-}
+  
 +-succ-succ : ∀ (m n : ℕ) → suc m + suc n ≡ suc(m + n + 1)
 +-succ-succ = solve-∀
 
