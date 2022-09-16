@@ -23,7 +23,6 @@ to (suc n) = inc (to n)
 
 from : Bin → ℕ
 from ⟨⟩ = 0
-from (⟨⟩ O) = 0
 from (b O) = (from b) + (from b)
 from (b I) = (from b) + (from b) + 1
 
