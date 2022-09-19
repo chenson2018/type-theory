@@ -1,10 +1,10 @@
 module Bin where
 
 import Relation.Binary.PropositionalEquality as Eq
-open Eq using (_≡_; refl; cong)
+open Eq using (_≡_; refl; cong; sym)
 open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; _∎)
-open import Data.Nat using (ℕ; zero; suc; _+_)
-open import Data.Nat.Properties using (+-identityʳ; +-suc)
+open import Data.Nat using (ℕ; zero; suc; _+_; _≤_; z≤n; s≤s)
+open import Data.Nat.Properties using (+-identityʳ; +-suc; ≤-refl; ≤-trans; ≤-antisym; ≤-total; +-monoʳ-≤; +-monoˡ-≤; +-mono-≤)
 open import Data.Nat.Tactic.RingSolver
 
 data Bin : Set where
@@ -57,3 +57,44 @@ from-to (suc n)
       inc-eq-suc (to n) 
     | from-to n 
   = refl
+
+data One : Bin → Set where
+  b1 :
+    One (⟨⟩ I)
+  _I : ∀ {b : Bin}
+    → One b 
+    → One (b I)
+  _O : ∀ {b : Bin}
+    → One b 
+    → One (b O)
+
+one-inc : ∀{b : Bin} → One b → One (inc b)
+one-inc b1 = b1 O
+one-inc (x O) = x I
+one-inc (x I) = (one-inc x) O
+
+1-≤-one : ∀ {b : Bin} → One b → 1 ≤ (from b) 
+1-≤-one b1 = ≤-refl {1} -- the same as s≤s z≤n
+1-≤-one {b O} (x O) = +-mono-≤ (1-≤-one {b} x) (z≤n {from b})
+1-≤-one {b I} (x I) = +-mono-≤ (z≤n {from b + from b}) (s≤s z≤n)
+
+data Can : Bin → Set where
+  c0 :
+    Can (⟨⟩ O)
+  cl : ∀{b : Bin}
+    → One b
+    → Can b
+
+can-inc : ∀{b : Bin} → Can b → Can (inc b)
+can-inc c0 = cl b1
+can-inc (cl x) = cl (one-inc x) 
+
+to-can : ∀(n : ℕ) → Can (to n)
+to-can zero    = c0
+to-can (suc n) = can-inc (to-can n)
+
+can-to-from : ∀{b : Bin} → Can b → to (from b) ≡ b
+can-to-from c0 = refl
+can-to-from (cl b1) = refl
+can-to-from (cl {b O} (x O)) = {!   !}
+can-to-from (cl {b I} (x I)) = {!   !}
