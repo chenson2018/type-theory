@@ -133,3 +133,12 @@ can-to-from (cl {b I} (x I))
     | can-shift (1-≤-one x)
     | can-to-from (cl x)
     = refl  
+
+open import plfa.part1.Isomorphism using (_≲_)
+
+ℕ≲Bin : ℕ ≲ Bin
+ℕ≲Bin = record
+  { to = to
+  ; from = from
+  ; from∘to = from-to
+  }
