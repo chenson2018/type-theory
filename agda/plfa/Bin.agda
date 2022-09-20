@@ -105,13 +105,19 @@ to-suc (suc n) =
     inc(inc (to n))
   ∎
 
--- I'm not sure if I should be using {suc n} or {suc(suc n)}
--- I am confused when Agda automatically unwraps a definition
+{-
+  This took me some time to figure out, I had some confusion at first with the way Agda unwraps definitions
+  The crucial piece is (s≤s (z≤n {n})), allowing recursion to the {suc n} case
+-}
 
 can-shift : ∀ {n : ℕ} → 1 ≤ n → to(n + n) ≡ (to n) O
-can-shift {suc zero} x = refl
-can-shift {suc n} x = {!   !}
--- can-shift {suc(suc n)} x = {!   !}
+can-shift {suc zero} (s≤s x) = refl
+can-shift {suc(suc n)} x = 
+  begin
+    inc(to (suc n + suc(suc n)))   ≡⟨ cong inc (cong to (+-comm (suc n) (suc (suc n)))) ⟩
+    inc (inc (to (suc n + suc n))) ≡⟨ cong inc (cong inc (can-shift {suc n} (s≤s (z≤n {n})))) ⟩ 
+    to (suc (suc n)) O
+  ∎
 
 can-to-from : ∀{b : Bin} → Can b → to (from b) ≡ b
 can-to-from c0 = refl
