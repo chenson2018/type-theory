@@ -3,8 +3,8 @@ module Bin where
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; refl; cong; sym)
 open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; _∎)
-open import Data.Nat using (ℕ; zero; suc; _+_; _≤_; z≤n; s≤s)
-open import Data.Nat.Properties using (+-identityʳ; +-suc; ≤-refl; ≤-trans; ≤-antisym; ≤-total; +-monoʳ-≤; +-monoˡ-≤; +-mono-≤)
+open import Data.Nat using (ℕ; zero; suc; _+_; _≤_; z≤n; s≤s; _<_)
+open import Data.Nat.Properties using (+-identityʳ; +-comm; +-suc; ≤-refl; +-mono-≤)
 open import Data.Nat.Tactic.RingSolver
 
 data Bin : Set where
@@ -37,6 +37,9 @@ from (b I) = (from b) + (from b) + 1
 
 +1-eq-suc : ∀ (m n : ℕ) → m + n + 1 ≡ suc(m + n)
 +1-eq-suc = solve-∀
+
++1-eq-suc` : ∀ (n : ℕ) → n + 1 ≡ suc(n)
++1-eq-suc` = solve-∀
 
 inc-eq-suc : ∀ (b : Bin) → from (inc b) ≡ suc (from b)
 inc-eq-suc ⟨⟩ = refl 
@@ -93,8 +96,37 @@ to-can : ∀(n : ℕ) → Can (to n)
 to-can zero    = c0
 to-can (suc n) = can-inc (to-can n)
 
+to-suc : ∀(n : ℕ) → to(n + 1) ≡ inc(to n) 
+to-suc zero = refl
+to-suc (suc n) = 
+  begin
+    inc(to (n + 1)) ≡⟨ cong inc (cong to (+1-eq-suc` n)) ⟩
+    inc(to (suc n)) ≡⟨⟩
+    inc(inc (to n))
+  ∎
+
+-- this was miserable to figure out
+-- sometimes I don't like when Agda automatically unwraps a definition
+
+can-shift : ∀ {n : ℕ} → 1 ≤ n → to(n + n) ≡ (to n) O
+can-shift {suc zero} x = refl
+can-shift {suc (suc n)} x = 
+  begin
+  to(suc (suc n) + suc (suc n)) ≡⟨ {!   !} ⟩
+  (to (suc (suc n)) O) 
+  ∎
+
 can-to-from : ∀{b : Bin} → Can b → to (from b) ≡ b
 can-to-from c0 = refl
 can-to-from (cl b1) = refl
-can-to-from (cl {b O} (x O)) = {!   !}
-can-to-from (cl {b I} (x I)) = {!   !}
+can-to-from (cl {b O} (x O))
+  rewrite 
+      can-shift (1-≤-one x)
+    | can-to-from (cl x)
+    = refl
+can-to-from (cl {b I} (x I))
+  rewrite
+      to-suc (from b + from b)
+    | can-shift (1-≤-one x)
+    | can-to-from (cl x)
+    = refl 
