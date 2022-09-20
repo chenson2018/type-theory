@@ -134,11 +134,68 @@ can-to-from (cl {b I} (x I))
     | can-to-from (cl x)
     = refl  
 
-open import plfa.part1.Isomorphism using (_≲_)
+open import plfa.part1.Isomorphism using (_≲_; _≃_)
 
 ℕ≲Bin : ℕ ≲ Bin
 ℕ≲Bin = record
   { to = to
   ; from = from
   ; from∘to = from-to
+  }
+
+{-
+  These first two proofs are interesting. They show that for any b : Bin, there is only one proof that b
+  has a leading one or is cannonical. This is explicit in constructing that proof. 
+-}
+
+≡One : ∀ {b : Bin} (o o′ : One b) → o ≡ o′
+≡One b1 b1        = refl
+≡One (o I) (o′ I) = cong _I (≡One o o′)
+≡One (o O) (o′ O) = cong _O (≡One o o′)
+
+{-
+  Note that the below can be shorter by using the case:
+    ≡Can (cl o) (cl o′) = cong cl (≡One o o′)
+  
+  I thought it more instructive to show that this was also exhaustive. 
+  Interestingly, this eliminates one absurd pattern
+-}
+
+≡Can : ∀ {b : Bin} (cb cb′ : Can b) → cb ≡ cb′
+≡Can c0 (cl (() O)) -- absurd pattern, as ≡Can c0 (cl x) gives a goal of c0 ≡ cl One(⟨⟩ O) 
+≡Can c0 c0 = refl
+≡Can (cl b1) (cl b1) = refl
+≡Can (cl (cb O)) (cl (cb` O)) = cong cl (≡One (cb O) (cb` O))
+≡Can (cl (cb I)) (cl (cb` I)) = cong cl (≡One (cb I) (cb` I))
+
+open import Data.Product using (_×_; proj₁; proj₂; ∃; ∃-syntax) renaming (_,_ to ⟨_,_⟩)
+
+proj₁≡→Can≡ : {cb cb′ : ∃[ b ] Can b} → proj₁ cb ≡ proj₁ cb′ → cb ≡ cb′
+proj₁≡→Can≡ = {!   !}
+
+{-
+  It is interesting how this isomorphism feels different from others, because it forces us to confront
+  the existential as its own type, not just syntax. 
+
+  The type ∃[ b ] (Can b) is restricting Bin to exclude non-unique binary numbers introduced by 
+  leading zeroes, as described by Can.
+ 
+  The type of Can here is crucial, in that its constructors are applied to (b : Bin) to "refine" it.
+
+  The existential's inhabitants are those where both (b: Bin) and (Can b) can (depending on definition) 
+  be placed into a record type where Can b is constructed from b using proj₁ or satisfy:
+     
+        (b : Bin) → (Can : Bin → Set) b →  ∑ Bin Can
+                                        →  Σ[ b ∈ Bin ] Can
+                                        →  ∃[ b ] Can
+
+  The last syntax is most familiar at first, but once I really think of this in terms of types, the former seem more intuitive! 
+-}
+
+ℕ≃∃Can : ℕ ≃ (∃[ b ] (Can b))
+ℕ≃∃Can = record
+  { to      = {!   !}
+  ; from    = {!   !}
+  ; from∘to = {!   !}
+  ; to∘from = {!   !}
   }
