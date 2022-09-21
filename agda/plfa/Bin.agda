@@ -1,10 +1,10 @@
 module Bin where
 
 import Relation.Binary.PropositionalEquality as Eq
-open Eq using (_≡_; refl; cong; sym)
+open Eq using (_≡_; refl; cong)
 open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; _∎)
-open import Data.Nat using (ℕ; zero; suc; _+_; _≤_; z≤n; s≤s; _<_)
-open import Data.Nat.Properties using (+-identityʳ; +-comm; +-suc; ≤-refl; +-mono-≤)
+open import Data.Nat using (ℕ; zero; suc; _+_; _≤_; z≤n; s≤s)
+open import Data.Nat.Properties using (+-comm; ≤-refl; +-mono-≤)
 open import Data.Nat.Tactic.RingSolver
 
 data Bin : Set where
@@ -168,7 +168,7 @@ open import plfa.part1.Isomorphism using (_≲_; _≃_)
 ≡Can (cl (cb O)) (cl (cb` O)) = cong cl (≡One (cb O) (cb` O))
 ≡Can (cl (cb I)) (cl (cb` I)) = cong cl (≡One (cb I) (cb` I))
 
-open import Data.Product using (_×_; proj₁; proj₂; ∃; ∃-syntax) renaming (_,_ to ⟨_,_⟩)
+open import Data.Product using (proj₁; ∃; ∃-syntax) renaming (_,_ to ⟨_,_⟩)
 
 {-
   Intuitively, this is saying that if I have two binary numbers that are equivalent:
