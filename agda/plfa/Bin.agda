@@ -170,8 +170,25 @@ open import plfa.part1.Isomorphism using (_≲_; _≃_)
 
 open import Data.Product using (_×_; proj₁; proj₂; ∃; ∃-syntax) renaming (_,_ to ⟨_,_⟩)
 
+{-
+  Intuitively, this is saying that if I have two binary numbers that are equivalent:
+    b  : ⟨⟩ I O I
+    b′ : ⟨⟩ I O I
+
+  then their sum types are equivalent:
+
+    cb  : ⟨ ⟨⟩ I O I , Can(One(⟨⟩ I O I))⟩ 
+    cb′ : ⟨ ⟨⟩ I O I , Can(One(⟨⟩ I O I))⟩
+
+    Note that if we said this about proj₂, this would be false:
+
+    cb  : ⟨ ⟨⟩       I O I , Can(One(⟨⟩ I O I))⟩ 
+    cb′ : ⟨ ⟨⟩ O O O I O I , Can(One(⟨⟩ I O I))⟩
+
+-}
+
 proj₁≡→Can≡ : {cb cb′ : ∃[ b ] Can b} → proj₁ cb ≡ proj₁ cb′ → cb ≡ cb′
-proj₁≡→Can≡ = {!   !}
+proj₁≡→Can≡ {⟨ b , cb ⟩} {⟨ b , cb′ ⟩} refl = cong (λ{ x → ⟨ b , x ⟩ }) (≡Can cb cb′)
 
 {-
   It is interesting how this isomorphism feels different from others, because it forces us to confront
@@ -190,12 +207,25 @@ proj₁≡→Can≡ = {!   !}
                                         →  ∃[ b ] Can
 
   The last syntax is most familiar at first, but once I really think of this in terms of types, the former seem more intuitive! 
+  
+  It's important to note how to was written such that it always "picks" the cannonical binary, as evidenced by (to-can b).
+
+  When we go the other way around, there is only one Nat we could pick i.e. it's a "smaller", non-sum type with ℕ≲Bin
+
+  For from∘to, we don't need this extra information from the sum type, as this is really true for all Bin and we 
+  would "drop" this information in the middle:
+
+      Nat → ⟨ Bin , Can b ⟩ → Nat 
+
+  However with to∘from we use proj₂ for the evidence that we are starting and ending with a cannonical binary:
+
+    ⟨ Bin , Can b ⟩ → Nat → ⟨ Bin , Can b ⟩      
 -}
 
 ℕ≃∃Can : ℕ ≃ (∃[ b ] (Can b))
 ℕ≃∃Can = record
-  { to      = {!   !}
-  ; from    = {!   !}
-  ; from∘to = {!   !}
-  ; to∘from = {!   !}
+  { to      = λ{ n → ⟨ to n , to-can n ⟩ }
+  ; from    = λ{ ⟨ b , cb ⟩ → from b }
+  ; from∘to = from-to
+  ; to∘from = λ{ ⟨ b , cb ⟩ → proj₁≡→Can≡ (can-to-from cb) }
   }
