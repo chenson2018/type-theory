@@ -98,12 +98,7 @@ to-can (suc n) = can-inc (to-can n)
 
 to-suc : ∀(n : ℕ) → to(n + 1) ≡ inc(to n) 
 to-suc zero = refl
-to-suc (suc n) = 
-  begin
-    inc(to (n + 1)) ≡⟨ cong inc (cong to (+1-eq-suc` n)) ⟩
-    inc(to (suc n)) ≡⟨⟩
-    inc(inc (to n))
-  ∎
+to-suc (suc n) rewrite +1-eq-suc` n = refl 
 
 {-
   This took me some time to figure out, I had some confusion at first with the way Agda unwraps definitions
